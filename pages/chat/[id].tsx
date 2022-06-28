@@ -33,7 +33,12 @@ const ChatPage: NextPage = () => {
     }
   }, [user]);
 
-  if (loading) return <Loading />;
+  if (loading)
+    return (
+      <Layout>
+        <Loading />
+      </Layout>
+    );
 
   return (
     <Layout>
