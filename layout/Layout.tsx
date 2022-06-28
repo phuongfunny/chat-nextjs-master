@@ -25,6 +25,7 @@ const Layout = ({ children }: any) => {
       <SideBar
         nameUser={user?.displayName ? user.displayName : ""}
         avatar={user?.photoURL ? user.photoURL : ""}
+        email={user?.email ? user.email : ""}
       />
       <Flex flex={1} direction="column">
         {children}

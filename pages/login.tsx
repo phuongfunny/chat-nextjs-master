@@ -8,7 +8,6 @@ import { auth } from "../firebase.config";
 const LoginPage: NextPage = () => {
   const [user, loading, error] = useAuthState(auth);
   const router = useRouter();
-  console.log("user", user);
   if (user) {
     router.push("/chat");
   }

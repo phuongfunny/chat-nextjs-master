@@ -1,10 +1,14 @@
 import { Flex, Text } from "@chakra-ui/react";
-import { collection } from "firebase/firestore";
+import { collection, doc, limit, orderBy, query } from "firebase/firestore";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useCollection } from "react-firebase-hooks/firestore";
+import {
+  useCollection,
+  useCollectionData,
+  useDocumentData,
+} from "react-firebase-hooks/firestore";
 import BottomBar from "../../components/BottomBar";
 import Loading from "../../components/Loading";
 import SideBar from "../../components/SideBar";
@@ -14,10 +18,13 @@ import Layout from "../../layout/Layout";
 
 const ChatPage: NextPage = () => {
   const [user] = useAuthState(auth);
-  const [snapshot, loading, error] = useCollection(collection(db, "chats"));
-  const chats = snapshot?.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-
   const router = useRouter();
+  const { id } = router.query;
+  const q = query(collection(db, `chats/${id}/messages`), orderBy("timestamp"));
+
+  const [messages, loading] = useCollectionData(q);
+  const [chat] = useDocumentData(doc(db, `chats/${id}`));
+  const sender = chat?.users.find((item: string) => item !== user?.email);
 
   useEffect(() => {
     if (!user) {
@@ -30,40 +37,24 @@ const ChatPage: NextPage = () => {
 
   return (
     <Layout>
-      <TopBar email="Con ga Quang De" />
+      <TopBar email={sender ?? "No name"} />
       <Flex flex={1} direction="column" p={5}>
-        <Flex
-          bg={"green.300"}
-          w="fit-content"
-          minWidth={"100px"}
-          borderRadius={"lg"}
-          mb="2"
-          p={2}
-        >
-          <Text>This is a dunmy message</Text>
-        </Flex>
-        <Flex
-          bg={"green.300"}
-          w="fit-content"
-          minWidth={"100px"}
-          borderRadius={"lg"}
-          mb="2"
-          p={2}
-        >
-          <Text>This is a dunmy message</Text>
-        </Flex>
-        <Flex
-          bg={"gray.300"}
-          w="fit-content"
-          minWidth={"100px"}
-          borderRadius={"lg"}
-          p={2}
-          alignSelf="end"
-        >
-          <Text>This is a dunmy message</Text>
-        </Flex>
+        {messages?.map((mess) => (
+          <Flex
+            bg={mess.sender !== user?.email ? "green.300" : "gray.300"}
+            w="fit-content"
+            minWidth={"100px"}
+            borderRadius={"lg"}
+            mb="2"
+            p={2}
+            key={Math.random()}
+            alignSelf={mess.sender !== user?.email ? "start" : "end"}
+          >
+            <Text>{mess.content}</Text>
+          </Flex>
+        ))}
       </Flex>
-      <BottomBar />
+      <BottomBar id={id?.toString() ?? ""} sender={user?.email ?? ""} />
     </Layout>
   );
 };
