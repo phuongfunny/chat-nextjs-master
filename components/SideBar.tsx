@@ -34,7 +34,7 @@ export default function SideBar({ avatar, nameUser, email }: ISideBarProps) {
 
   const chatExisting = (email: any) =>
     chats.some(
-      (chat) => chat.users.includes(email) && chat.users.includes(email)
+      (chat) => chat?.users?.includes(email) && chat.users.includes(email)
     );
 
   const createNewChat = async () => {
