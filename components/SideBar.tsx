@@ -41,7 +41,10 @@ export default function SideBar({ avatar, nameUser, email }: ISideBarProps) {
     const newChat = prompt("Please enter a email new message!");
 
     if (chatExisting(newChat)) alert("Email is existing!");
-    else await addDoc(collection(db, "chats"), { users: [email, newChat] });
+    else {
+      if (newChat !== "" && newChat)
+        await addDoc(collection(db, "chats"), { users: [email, newChat] });
+    }
   };
 
   return (
